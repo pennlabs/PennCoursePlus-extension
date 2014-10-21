@@ -1,0 +1,47 @@
+.container {
+    position:relative;
+    overflow:auto;
+    display:inline-block;
+}
+/*.block {
+    display:inline-block;
+    position:relative;
+    background-color: #BADA55;
+    height: 100%;
+    width: 100%;
+    border-radius:5px;
+    p {
+        display: inline-block;
+    }
+}*/
+table {
+    /*border-collapse: collapse;*/
+    /*border:1;*/
+    float:left;
+    /*border-spacing: 2px;*/
+    border-spacing: 0px;
+    position:relative;
+}
+
+td {
+    height: 30px;
+    width: 100px;
+    background-color: #BADA55;
+}
+/*
+tr td {
+    background-color: #000;
+};*/
+
+.time {
+    background-color: #fff;
+    text-align:right;
+    padding-right: 5px;
+}
+
+#checkboxes {
+    width: 500px;
+    position:relative;
+    float:right;
+    margin-left: 100px;
+}
