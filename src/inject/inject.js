@@ -1,20 +1,26 @@
 /*
-To implement
-    1. Link to PCR site
-    2. Remove links from default headers in table
-    3. Fix styling
-    4. Make it easy to find easy classes that fulfill requirements
-    5. Quality to ease ratio
-    6. Fix "NA" rating
-    7. double countring for sectors and foundation
-    8. Make PCR headings more clear
-    9. don't check recitations
+  To implement
+  1. Link to PCR site
+  2. Remove links from default headers in table
+  3. Fix styling
+  4. Make it easy to find easy classes that fulfill requirements
+  5. Quality to ease ratio
+  6. Fix "NA" rating
+  7. double countring for sectors and foundation
+  8. Make PCR headings more clear
+  9. don't check recitations
 */
 
 var baseURL = "https://penncourseplus.com/"
 // var baseURL = "http://api.penncoursereview.com/v1/"
 var PCR_AUTH_TOKEN = 'qL_UuCVxRBUmjWbkCdI554grLjRMPY'
 
+
+function injectStyles(rule) {
+    var div = $("<div />", {
+        html: '&shy;<style>' + rule + '</style>'
+    }).appendTo("body");    
+}
 
 //keep checking if state is ready
 var readyStateCheckInterval = setInterval(function() {
@@ -37,8 +43,7 @@ var readyStateCheckInterval = setInterval(function() {
         var secondWord = title.split(' ')[1]; //grabs second word of the title
 
         if (secondWord == 'Search') { //checks if user is on the course search page
-           // $('head').append('<link rel="stylesheet" href="' + chrome.extension.getURL("src/inject/theme.default.css") + '" type="text/css" />');
-
+           
             //formats table so it can be sorted using TableSorter plugin
             $('.pitDarkDataTable tr:first').unwrap().wrap("<thead/>");
             $('thead').children().children().children().children().unwrap().wrap("<span/>");
@@ -51,10 +56,6 @@ var readyStateCheckInterval = setInterval(function() {
             $(".pit thead tr").append('<th id="quality">Quality</th>');
             $(".pit thead tr").append('<th id="professor">Professor</th>');
 
-           // $('head').append('<link rel="stylesheet" href="' + chrome.extension.getURL("src/inject/theme.default.css") + '" type="text/css" />');
-           //document.styleSheets[0].insertRule('.tablesorter .tablesorter-header {padding: 4px 20px 4px 4px;}',0);
-
-
             $('#quality').tooltipster({
                 content: "Average quality of course; higher is better."
             });
@@ -65,8 +66,7 @@ var readyStateCheckInterval = setInterval(function() {
                 content: "Quality of Professor of course; higher is better."
             });
 
-            //document.styleSheets[0].insertRule('.pit' + ' {display: inline !important}', 0);
-               $('.pit').show();
+            $('.pit').show();
             //fetches all courses in the course table
             var courseList = $('.pit tbody').children();
             $(courseList).each(function() {
@@ -178,13 +178,8 @@ var readyStateCheckInterval = setInterval(function() {
                     // theme: "default"
                 });
 
-              //  $('.pit').show();
-
-
             });
         }
-        $('.pitDarkDataTable').show();
-
-
+        injectStyles('.pitDarkDataTable { display: initial; }')
     }
 }, 50);

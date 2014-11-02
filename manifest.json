@@ -1,6 +1,6 @@
 {
     "name": "PennCoursePlus",
-    "version": "0.0.22",
+    "version" : "0.0.23",
     "manifest_version": 2,
     "description": "Choosing courses has never been easier",
     "homepage_url": "http://penncourseplus.com",
@@ -31,3 +31,4 @@
       "src/inject/profHash.json",
       "src/inject/inject.css"]
 }
+ 
