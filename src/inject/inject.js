@@ -1,38 +1,40 @@
 /*
-  To implement
-  1. Link to PCR site
-  2. Remove links from default headers in table
-  3. Fix styling
-  4. Make it easy to find easy classes that fulfill requirements
-  5. Quality to ease ratio
-  6. Fix "NA" rating
-  7. double countring for sectors and foundation
-  8. Make PCR headings more clear
-  9. don't check recitations
+To implement
+    1. Link to PCR site
+    2. Remove links from default headers in table
+    3. Fix styling
+    4. Make it easy to find easy classes that fulfill requirements
+    5. Quality to ease ratio
+    6. Fix "NA" rating
+    7. double countring for sectors and foundation
+    8. Make PCR headings more clear
+    9. don't check recitations
 */
 
-var baseURL = "https://penncourseplus.com/"
-// var baseURL = "http://api.penncoursereview.com/v1/"
+var baseURL = "https://pengit ncourseplus.com/pcr/"
+// var baseURL = "http://localhost:5000/pcr"
 var PCR_AUTH_TOKEN = 'qL_UuCVxRBUmjWbkCdI554grLjRMPY'
 
-
-function injectStyles(rule) {
-    var div = $("<div />", {
-        html: '&shy;<style>' + rule + '</style>'
-    }).appendTo("body");    
-}
 
 //keep checking if state is ready
 var readyStateCheckInterval = setInterval(function() {
     if (document.readyState === "complete") {
         clearInterval(readyStateCheckInterval);
         if (document.title === 'Course Search & Mock Schedule') {
+            var data = [];
+            $('#courseCartBoxForm a span.fastButtonLinkText').each(function() {
+                var text = $(this).html();
+                if (text.indexOf('-') >= 0 && text.indexOf('Delete') == -1) {
+                    data.push(text);
+                }
+            })
             var $button = $('<input type="button" value="classes" />');
             $button.appendTo($('body'));
             $button.on('click', function() {
                 console.log('opening');
                 chrome.runtime.sendMessage({
-                    type: 'launch_scheduler'
+                    type: 'launch_scheduler',
+                    data: data
                 });
             });
         }
@@ -43,7 +45,8 @@ var readyStateCheckInterval = setInterval(function() {
         var secondWord = title.split(' ')[1]; //grabs second word of the title
 
         if (secondWord == 'Search') { //checks if user is on the course search page
-           
+           // $('head').append('<link rel="stylesheet" href="' + chrome.extension.getURL("src/inject/theme.default.css") + '" type="text/css" />');
+
             //formats table so it can be sorted using TableSorter plugin
             $('.pitDarkDataTable tr:first').unwrap().wrap("<thead/>");
             $('thead').children().children().children().children().unwrap().wrap("<span/>");
@@ -56,6 +59,10 @@ var readyStateCheckInterval = setInterval(function() {
             $(".pit thead tr").append('<th id="quality">Quality</th>');
             $(".pit thead tr").append('<th id="professor">Professor</th>');
 
+           // $('head').append('<link rel="stylesheet" href="' + chrome.extension.getURL("src/inject/theme.default.css") + '" type="text/css" />');
+           //document.styleSheets[0].insertRule('.tablesorter .tablesorter-header {padding: 4px 20px 4px 4px;}',0);
+
+
             $('#quality').tooltipster({
                 content: "Average quality of course; higher is better."
             });
@@ -66,7 +73,8 @@ var readyStateCheckInterval = setInterval(function() {
                 content: "Quality of Professor of course; higher is better."
             });
 
-            $('.pit').show();
+            //document.styleSheets[0].insertRule('.pit' + ' {display: inline !important}', 0);
+               $('.pit').show();
             //fetches all courses in the course table
             var courseList = $('.pit tbody').children();
             $(courseList).each(function() {
@@ -88,7 +96,7 @@ var readyStateCheckInterval = setInterval(function() {
                 if (courseType.trim() !== 'Recitation' && courseType.trim() !== 'Laboratory') {
                     var dept = courseId.split('-')[0];
                     var history;
-                    var url = baseURL + 'coursehistories/' + courseId + '/?token=public';
+                    var url = baseURL + '/coursehistories/' + courseId + '/?token=public';
                     $.ajax({
                         type: 'GET',
                         url: url,
@@ -130,7 +138,7 @@ var readyStateCheckInterval = setInterval(function() {
                                 var p = prof[lastName];
                                 for (var person in p) {
                                     if ($.inArray(dept, p[person].depts) >= 0 && p[person].first_name.split(" ")[0] == firstName) {
-                                        var url = baseURL + 'instructors/' + p[person]["id"] + '/reviews?token=' + PCR_AUTH_TOKEN;
+                                        var url = baseURL + '/instructors/' + p[person]["id"] + '/reviews?token=' + PCR_AUTH_TOKEN;
                                         $.getJSON(url, function(profReviews) {
                                             var rProf = 0;
                                             var j = 0;
@@ -148,11 +156,7 @@ var readyStateCheckInterval = setInterval(function() {
                             }
                         );
                     }
-
-
                 }
-                //$('.pit').show();
-
             });
 
             $(document).ajaxStop(function() {
@@ -178,8 +182,13 @@ var readyStateCheckInterval = setInterval(function() {
                     // theme: "default"
                 });
 
+              //  $('.pit').show();
+
+
             });
         }
-        injectStyles('.pitDarkDataTable { display: initial; }')
+        $('.pitDarkDataTable').show();
+
+
     }
 }, 50);

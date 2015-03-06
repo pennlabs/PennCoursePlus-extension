@@ -1,6 +1,8 @@
 // Handle requests for passwords
+var classes;
 chrome.runtime.onMessage.addListener(function(request) {
     if (request.type === 'launch_scheduler') {
+        classes = request.data;
         chrome.tabs.create({
             url: chrome.extension.getURL('scheduler.html'),
             active: false
