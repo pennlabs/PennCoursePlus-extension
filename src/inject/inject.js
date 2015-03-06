@@ -11,9 +11,8 @@ To implement
     9. don't check recitations
 */
 
-var baseURL = "https://pengit ncourseplus.com/pcr/"
-// var baseURL = "http://localhost:5000/pcr"
-var PCR_AUTH_TOKEN = 'qL_UuCVxRBUmjWbkCdI554grLjRMPY'
+var baseURL = "https://penncourseplus.com/pcr/";
+var PCR_AUTH_TOKEN = 'qL_UuCVxRBUmjWbkCdI554grLjRMPY';
 
 
 //keep checking if state is ready
