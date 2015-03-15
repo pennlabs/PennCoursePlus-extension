@@ -19,18 +19,18 @@ var PCR_AUTH_TOKEN = 'qL_UuCVxRBUmjWbkCdI554grLjRMPY';
 var readyStateCheckInterval = setInterval(function() {
     if (document.readyState === "complete") {
         clearInterval(readyStateCheckInterval);
-        if (document.title === 'Course Search & Mock Schedule') {
+       if (document.title === 'Course Search & Mock Schedule') {
             var data = [];
             $('#courseCartBoxForm a span.fastButtonLinkText').each(function() {
                 var text = $(this).html();
                 if (text.indexOf('-') >= 0 && text.indexOf('Delete') == -1) {
-                    data.push(text);
+                    data.push(text.replace(/\s/g, '')); //get rid of all spaces
                 }
             })
-            var $button = $('<input type="button" value="classes" />');
-            $button.appendTo($('body'));
+            var $button = $('<input type="button" id = "launcher" value="Launch Interactive Scheduler" />');
+            $('#courseCartBoxForm').after($button);
+            // $button.appendTo($('body'));
             $button.on('click', function() {
-                console.log('opening');
                 chrome.runtime.sendMessage({
                     type: 'launch_scheduler',
                     data: data
