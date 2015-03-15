@@ -132,7 +132,6 @@ function render(classes) {
     var info = {};
     $('.container tbody').empty();
     var promises = classes.map(function(id) {
-        // debugger
         return $.ajax({
             url: baseURL + 'scheduler',
             type: 'GET',
@@ -162,14 +161,22 @@ $(function() {
         var classes = bg.classes;
         for (var i in classes) {
             //randomly generate new hexcodes!
-            palette.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+            var hex;
+            do {
+                hex = '#' + Math.floor(Math.random() * 16777215).toString(16)
+                //make sure you don't have white, black, or repeat colors
+                console.log(hex);
+            } while (hex == "#000000" || hex == "#ffffff" || palette.indexOf(hex) > 0 )
+
+            palette.push(hex);
         }
     }
     for (var i in classes) {
+        var cl = classes[i]
         if (i < 2) {
-            $('#checkboxes').append('<input type="checkbox" checked="true" name=' + classes[i] + '>' + classes[i] + '<br>');
+            $('#checkboxes').append('<input type="checkbox" checked="true" name="' + cl + '" id="' +cl + 'label">'+ '<label for="'+cl + 'label"><span>'+cl + '</span></label>' + '<br>');
         } else {
-            $('#checkboxes').append('<input type="checkbox" name=' + classes[i] + '>' + classes[i] + '<br>');
+            $('#checkboxes').append('<input type="checkbox" name="' + cl + '" id="' +cl + 'label">'+ '<label for="'+cl + 'label"><span>'+cl + '</span></label>' + '<br>');
 
         }
     }
@@ -184,7 +191,6 @@ $(function() {
             $(':checked').each(function() {
             classes.push($(this).attr('name'));
         })
-        debugger
         render(classes);
     });
 

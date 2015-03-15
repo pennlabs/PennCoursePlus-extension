@@ -1,14 +1,10 @@
 body {
     font-family: arial;
     font-size: 12px;
-    /*word-break: break-all;*/
-    /*word-wrap: break-word;*/
+    width: 1000px;
 }
 
 .container {
-    position:relative;
-    overflow:auto;
-    display:inline-block;
     float:left;
     width: 800px;
 }
@@ -56,9 +52,49 @@ tr td {
     }
 
 #control_panel {
-    width: 500px;
-    position:relative;
+    width: 120px;
+    margin-left: 20px;
+    /*position:relative;*/
     float:left;
-    display:inline-block;
-/*    margin-left: 100px;
-*/}
+    /*display:inline-block;*/
+}
+
+    input[type="checkbox"] {
+        display:none;
+    }
+
+    #checkboxes label:before {
+        border-radius: 3px;
+    }
+
+    #checkboxes label span {
+        float:right;
+        margin-right:10px;
+    }
+    input[type=checkbox]:checked + label:before {
+        content: "\2713";
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, .2);
+        font-size: 12px;
+        color: #000000;
+        text-align: right;
+        line-height: 15px;
+        border-radius:3px;
+    }
+    input[type=checkbox] + label:before {
+        content: "_";
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, .2);
+        font-size: 12px;
+        color: #000000;
+        text-align: right;
+        line-height: 15px;
+        border-radius:3px;
+    }
+   #rerender {
+    margin-top: 20px;
+    font-weight: 600;
+    background-color: navy;
+    color: white;
+    border:none;
+    font-family: arial;
+}
+
