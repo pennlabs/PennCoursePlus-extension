@@ -1,3 +1,16 @@
+/*
+Our injected button styling
+*/
+#launcher {
+	font-weight: 600;
+	background-color: navy;
+	
+	color: white;
+	border:none;
+	font-family: arial;
+}
+
+
 .pit {
 	width :850px !important;
 }
