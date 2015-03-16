@@ -1,5 +1,7 @@
-var baseURL = "https://penncourseplus.com/";
-
+var baseURL = "https://penncourseplus.com";
+// var baseURL = "http://localhost:5000"
+var PCR_AUTH_TOKEN = 'qL_UuCVxRBUmjWbkCdI554grLjRMPY';
+var global_data = {};
 
 function processTimes(data) {
     var minTime = 24;
@@ -68,7 +70,7 @@ function generateGraph(data) {
         var x = convertToTime(date);
         tr.id = x;
         timeBlock.innerHTML = x;
-        $('tbody').append(tr);
+        $('#schedule tbody').append(tr);
         $(tr).append(timeBlock);
         for (var day in days) {
             var td2 = document.createElement('td');
@@ -77,13 +79,14 @@ function generateGraph(data) {
             $(td2).addClass(days[day]);
         }
     }
-
     delete data.minTime;
     delete data.maxTime;
     for (var c in data) {
         for (var meeting in data[c].meetings) {
             for (var time = data[c].startTime; time < data[c].endTime; time += 0.5) {
                 var y = convertToTime(time);
+                // color the corresponding label in the table
+                $('#' + c + 'label').parent().css('background-color', data[c].color);
 
                 var $block = $('#' + y + ' .' + data[c].meetings[meeting]);
                 var newBlock = document.createElement('td');
@@ -131,10 +134,95 @@ function generateGraph(data) {
 function render(classes) {
     var info = {};
     $('.container tbody').empty();
+    $('#panel td').css('background-color', '#fff');
+    for (var i in global_data) {
+        if (classes.indexOf(i) > -1) {
+            info[i] = global_data[i].meetings;
+        }
+    }
+    var times = processTimes(info);
+    generateGraph(times);
+}
+
+function generateInfo(classes) {
+    var ratings = {};
     var promises = classes.map(function(id) {
-        // debugger
+        var cl = id;
+        courseId = id.trim();
+        courseId = courseId.slice(0, -4).replace(/\s/g, '');
+        var dept = courseId.split('-')[0];
+        var history;
+        var url = baseURL + '/pcr/coursehistories/' + courseId + '/?token=public';
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            success: function(data) {
+                history = data;
+            }
+        }).done(function(data) {
+            $.ajax({
+                type: 'GET',
+                url: baseURL + '/pcr' + history.result.reviews.path + '?token=' + PCR_AUTH_TOKEN,
+                dataType: 'json',
+                success: function(data) {
+                    var difficulty = 0;
+                    var quality = 0;
+                    var i = 0;
+                    for (section in data.result.values) {
+                        difficulty += parseFloat(data.result.values[section].ratings.rDifficulty) || 0;
+                        quality += parseFloat(data.result.values[section].ratings.rCourseQuality) || 0;
+                        i++;
+                    }
+                    difficulty = difficulty / i;
+                    quality = quality / i;
+                    if (!Number.isNaN(difficulty) && difficulty > 0) {
+                        $('#' + cl + 'label').parent().parent().append('<td>' + difficulty.toFixed(2) + '</td>')
+                    }
+                    if (!Number.isNaN(quality) && quality > 0) {
+                        $('#' + cl + 'label').parent().parent().append('<td>' + quality.toFixed(2) + '</td>')
+                    }
+                }
+            });
+        });
+    });
+
+    $.getJSON('src/inject/profHash.json', function(prof) {
+        Object.keys(global_data).map(function(c) {
+            var dept = c.split('-')[0];
+            if (global_data[c].instructors.length > 0) {
+                var inst = global_data[c].instructors[0].name.toUpperCase().trim();
+                var lastName = inst.split(" ").pop();
+                var firstName = inst.split(" ")[0];
+                var p = prof[lastName];
+                for (var person in p) {
+                    if ($.inArray(dept, p[person].depts) >= 0 && p[person].first_name.split(" ")[0] == firstName) {
+                        var url = baseURL + '/pcr/instructors/' + p[person]["id"] + '/reviews?token=' + PCR_AUTH_TOKEN;
+                        $.getJSON(url, function(profReviews) {
+                            var rProf = 0;
+                            var j = 0;
+                            for (section in profReviews.result.values) {
+                                rProf += parseFloat(profReviews.result.values[section].ratings.rInstructorQuality);
+                                j++;
+                            }
+                            rProf = rProf / j;
+                            if (!Number.isNaN(rProf) && rProf > 0) {
+                                $('#' + c + 'label').parent().parent().append('<td>' + rProf.toFixed(2) + '</td>')
+                            }
+                        });
+                    }
+                }
+            }
+
+        });
+    });
+}
+
+function setup(classes) {
+    $('body').css('visibility', 'hidden');
+    var promises = classes.map(function(id) {
         return $.ajax({
-            url: baseURL + 'scheduler',
+            url: baseURL + '/scheduler',
             type: 'GET',
             dataType: 'json',
             async: false,
@@ -142,13 +230,11 @@ function render(classes) {
                 'class': id
             }
         }).done(function(data) {
-            info[id] = data;
+            global_data[id] = data;
         });
     });
     RSVP.all(promises).then(function(posts) {
-        console.log(info);
-        var times = processTimes(info);
-        generateGraph(times);
+        $('body').css('visibility', 'visible')
     });
 }
 
@@ -156,35 +242,44 @@ function render(classes) {
 $(function() {
     var classes;
     if (document.location.hostname == 'localhost') {
-        classes = ["CIS-120-001", "CIS-520-001", "CIS-380-001", "CIS-555-401"];
+        classes = ["MATH-312-001", "CIS-120-001", "MEAM-520-001", "CIS-380-001", "CIS-555-401"];
     } else {
         var bg = chrome.extension.getBackgroundPage();
         var classes = bg.classes;
         for (var i in classes) {
             //randomly generate new hexcodes!
-            palette.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+            var hex;
+            do {
+                hex = '#' + Math.floor(Math.random() * 16777215).toString(16)
+                    //make sure you don't have white, black, or repeat colors
+            } while (hex == "#000000" || hex == "#ffffff" || palette.indexOf(hex) > 0)
+
+            palette.push(hex);
         }
     }
+
+    setup(classes);
     for (var i in classes) {
+        var cl = classes[i]
         if (i < 2) {
-            $('#checkboxes').append('<input type="checkbox" checked="true" name=' + classes[i] + '>' + classes[i] + '<br>');
+            $('#panel tbody').append('<tr><td><input type="checkbox" checked="true" name="' + cl + '" id="' + cl + 'label">' + '<label for="' + cl + 'label"><span>' + cl + '</span></label>' + '</td></tr>');
         } else {
-            $('#checkboxes').append('<input type="checkbox" name=' + classes[i] + '>' + classes[i] + '<br>');
+            $('#panel tbody').append('<tr><td><input type="checkbox" name="' + cl + '" id="' + cl + 'label">' + '<label for="' + cl + 'label"><span>' + cl + '</span></label>' + '</td></tr>');
 
         }
     }
     if (classes.length > 2) {
-        render(classes.slice(0,2));
+        render(classes.slice(0, 2));
     } else {
         render(classes);
     }
+    generateInfo(classes);
 
     $('#rerender').click(function() {
         classes = [];
-            $(':checked').each(function() {
+        $(':checked').each(function() {
             classes.push($(this).attr('name'));
         })
-        debugger
         render(classes);
     });
 

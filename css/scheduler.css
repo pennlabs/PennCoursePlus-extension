@@ -1,14 +1,10 @@
 body {
     font-family: arial;
     font-size: 12px;
-    /*word-break: break-all;*/
-    /*word-wrap: break-word;*/
+    width: 1100px;
 }
 
 .container {
-    position:relative;
-    overflow:auto;
-    display:inline-block;
     float:left;
     width: 800px;
 }
@@ -18,7 +14,6 @@ table {
     border:0;
     float:left;
     margin-left: -100px;
-    /*border-spacing: 2px;*/
     border-spacing: 0px;
     position:relative;
 }
@@ -26,10 +21,8 @@ table {
 td {
     padding: 0px;
     height: 40px;
-    /*padding:5px;*/
     width: 150px;
     background-color: #ffffff;
-    /*display:block-table;*/
     border-bottom: 1px solid #d3d3d3 ;
 }
 td td {
@@ -56,9 +49,67 @@ tr td {
     }
 
 #control_panel {
-    width: 500px;
-    position:relative;
+    width: 220px;
+    margin-left: 20px;
     float:left;
-    display:inline-block;
-/*    margin-left: 100px;
-*/}
+}
+
+    input[type="checkbox"] {
+        display:none;
+    }
+
+    #checkboxes label:before {
+        border-radius: 3px;
+    }
+
+    #checkboxes label span {
+        float:right;
+        margin-right:10px;
+    }
+    input[type=checkbox]:checked + label:before {
+        content: "\2713";
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, .2);
+        font-size: 12px;
+        color: #000000;
+        text-align: right;
+        line-height: 15px;
+        border-radius:3px;
+    }
+    input[type=checkbox] + label:before {
+        content: "_";
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, .2);
+        font-size: 12px;
+        color: #000000;
+        text-align: right;
+        line-height: 15px;
+        border-radius:3px;
+    }
+   #rerender {
+    margin-top: 20px;
+    font-weight: 600;
+    background-color: navy;
+    color: white;
+    border:none;
+    font-family: arial;
+}
+    table#panel {
+        table-layout:fixed;
+    }
+    #panel td, #panel th {
+        width: 100px;
+    }
+    #panel td+td , #panel th+th{
+        padding-left: 5px;
+        width:auto;
+    }
+    #panel {
+        float:right;
+        margin-left: 0px;
+    }
+    #panel th {
+        /*width: 200px;*/
+    }
+
+    #panel td {
+        width: 100px;
+    }
