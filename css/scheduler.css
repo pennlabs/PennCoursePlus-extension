@@ -52,7 +52,7 @@ tr td {
     }
 
 #control_panel {
-    width: 120px;
+    width: 180px;
     margin-left: 20px;
     /*position:relative;*/
     float:left;
@@ -97,4 +97,24 @@ tr td {
     border:none;
     font-family: arial;
 }
+    table#panel {
+        table-layout:fixed;
+    }
+    #panel td, #panel th {
+        width: 100px;
+    }
+    #panel td+td , #panel th+th{
+        padding-left: 5px;
+        width:auto;
+    }
+    #panel {
+        float:right;
+        margin-left: 0px;
+    }
+    #panel th {
+        /*width: 200px;*/
+    }
 
+    #panel td {
+        width: 100px;
+    }
