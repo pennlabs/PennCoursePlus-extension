@@ -1,7 +1,7 @@
 body {
     font-family: arial;
     font-size: 12px;
-    width: 1000px;
+    width: 1100px;
 }
 
 .container {
@@ -14,7 +14,6 @@ table {
     border:0;
     float:left;
     margin-left: -100px;
-    /*border-spacing: 2px;*/
     border-spacing: 0px;
     position:relative;
 }
@@ -22,10 +21,8 @@ table {
 td {
     padding: 0px;
     height: 40px;
-    /*padding:5px;*/
     width: 150px;
     background-color: #ffffff;
-    /*display:block-table;*/
     border-bottom: 1px solid #d3d3d3 ;
 }
 td td {
@@ -52,11 +49,9 @@ tr td {
     }
 
 #control_panel {
-    width: 180px;
+    width: 220px;
     margin-left: 20px;
-    /*position:relative;*/
     float:left;
-    /*display:inline-block;*/
 }
 
     input[type="checkbox"] {

@@ -1,6 +1,7 @@
-var baseURL = "https://penncourseplus.com";
+// var baseURL = "https://penncourseplus.com";
+var baseURL = "http://localhost:5000"
 var PCR_AUTH_TOKEN = 'qL_UuCVxRBUmjWbkCdI554grLjRMPY';
-
+var global_data = {};
 
 function processTimes(data) {
     var minTime = 24;
@@ -134,23 +135,13 @@ function render(classes) {
     var info = {};
     $('.container tbody').empty();
     $('#panel td').css('background-color', '#fff');
-    var promises = classes.map(function(id) {
-        return $.ajax({
-            url: baseURL + '/scheduler',
-            type: 'GET',
-            dataType: 'json',
-            async: false,
-            data: {
-                'class': id
-            }
-        }).done(function(data) {
-            info[id] = data;
-        });
-    });
-    RSVP.all(promises).then(function(posts) {
-        var times = processTimes(info);
-        generateGraph(times);
-    });
+    for (var i in global_data) {
+        if (classes.indexOf(i) > -1) {
+            info[i] = global_data[i].meetings;
+        }
+    }
+    var times = processTimes(info);
+    generateGraph(times);
 }
 
 function generateInfo(classes) {
@@ -195,13 +186,61 @@ function generateInfo(classes) {
             });
         });
     });
+
+    $.getJSON('src/inject/profHash.json', function(prof) {
+        Object.keys(global_data).map(function(c) {
+            var dept = c.split('-')[0];
+            var inst = global_data[c].instructors[0].name.toUpperCase().trim();
+            var lastName = inst.split(" ").pop();
+            var firstName = inst.split(" ")[0];
+            var p = prof[lastName];
+            for (var person in p) {
+                if ($.inArray(dept, p[person].depts) >= 0 && p[person].first_name.split(" ")[0] == firstName) {
+                    var url = baseURL + '/pcr/instructors/' + p[person]["id"] + '/reviews?token=' + PCR_AUTH_TOKEN;
+                    $.getJSON(url, function(profReviews) {
+                        var rProf = 0;
+                        var j = 0;
+                        for (section in profReviews.result.values) {
+                            rProf += parseFloat(profReviews.result.values[section].ratings.rInstructorQuality);
+                            j++;
+                        }
+                        rProf = rProf / j;
+                        if (!Number.isNaN(rProf) && rProf > 0) {
+                        $('#' + c + 'label').parent().parent().append('<td>' + rProf.toFixed(2) + '</td>')
+                        }
+                    });
+                }
+            }
+
+        });
+    });
+}
+
+function setup(classes) {
+    $('body').css('visibility', 'hidden');
+    var promises = classes.map(function(id) {
+        return $.ajax({
+            url: baseURL + '/scheduler',
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            data: {
+                'class': id
+            }
+        }).done(function(data) {
+            global_data[id] = data;
+        });
+    });
+    RSVP.all(promises).then(function(posts) {
+        $('body').css('visibility', 'visible')
+    });
 }
 
 
 $(function() {
     var classes;
     if (document.location.hostname == 'localhost') {
-        classes = ["CIS-120-001", "CIS-520-001", "CIS-380-001", "CIS-555-401"];
+        classes = ["CIS-120-001", "MEAM-520-001", "CIS-380-001", "CIS-555-401"];
     } else {
         var bg = chrome.extension.getBackgroundPage();
         var classes = bg.classes;
@@ -211,12 +250,13 @@ $(function() {
             do {
                 hex = '#' + Math.floor(Math.random() * 16777215).toString(16)
                     //make sure you don't have white, black, or repeat colors
-                console.log(hex);
             } while (hex == "#000000" || hex == "#ffffff" || palette.indexOf(hex) > 0)
 
             palette.push(hex);
         }
     }
+
+    setup(classes);
     for (var i in classes) {
         var cl = classes[i]
         if (i < 2) {
