@@ -219,7 +219,7 @@ function generateInfo(classes) {
 }
 
 function setup(classes) {
-    $('body').css('visibility', 'hidden');
+    $('.container, #control_panel').css('visibility', 'hidden');
     var promises = classes.map(function(id) {
         return $.ajax({
             url: baseURL + '/scheduler',
@@ -234,7 +234,8 @@ function setup(classes) {
         });
     });
     RSVP.all(promises).then(function(posts) {
-        $('body').css('visibility', 'visible')
+          $('.container, #control_panel').css('visibility', 'visible')
+          $('.loader').hide();          
     });
 }
 
