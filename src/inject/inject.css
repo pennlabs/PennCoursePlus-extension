@@ -19,6 +19,9 @@ Our injected button styling
 	display:none;
 }
 
+.courseDetailsDataTable .pitDarkDataTable {
+	display:table;
+}
 .pitDarkDataTable {
      display:none;
 }
